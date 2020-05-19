@@ -11,9 +11,26 @@ ENV SONAR_SCANNER_HOME=${SONAR_SCANNER_HOME} \
     PATH=${SONAR_SCANNER_HOME}/bin:${NODEJS_HOME}/bin:${PATH} \
     NODE_PATH=${NODEJS_HOME}/lib/node_modules
 
+# 更新apt-get源
+RUN echo \
+    deb http://mirrors.aliyun.com/debian/ stretch main non-free contrib\
+    deb-src http://mirrors.aliyun.com/debian/ stretch main non-free contrib\
+    deb http://mirrors.aliyun.com/debian-security stretch/updates main\
+    deb-src http://mirrors.aliyun.com/debian-security stretch/updates main\
+    deb http://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib\
+    deb-src http://mirrors.aliyun.com/debian/ stretch-updates main non-free contrib\
+    deb http://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib\
+    deb-src http://mirrors.aliyun.com/debian/ stretch-backports main non-free contrib\
+    > /etc/apt/sources.list
+
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates git wget unzip xz-utils pylint shellcheck \
+    && apt-get install -y --no-install-recommends ca-certificates git wget unzip xz-utils pylint shellcheck locales locales-all \
     && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US.UTF-8  
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8  
 
 RUN groupadd --gid ${GID} scanner-cli \
     && useradd --uid ${UID} --gid scanner-cli --shell /bin/bash --create-home scanner-cli
